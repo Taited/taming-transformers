@@ -1,0 +1,33 @@
+{
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Taming Training",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "1,3",
+                "CUDA_LAUNCH_BLOCKING": "1",
+                "NCCL_IB_DISABLE": "1",
+                "NCCL_SOCKET_IFNAME": "eth0",
+                "NCCL_P2P_DISABLE": "1",
+                "NCCL_SHM_DISABLE": "1",
+                "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION": "python"},
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--base=configs/sflckr_cond_stage.yaml",
+                "-t=True",
+                "--gpus=0,1",
+            ]
+        }
+    ]
+}

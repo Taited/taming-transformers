@@ -17,8 +17,11 @@ class SegmentationBase(Dataset):
         self.data_csv = data_csv
         self.data_root = data_root
         self.segmentation_root = segmentation_root
-        with open(self.data_csv, "r") as f:
-            self.image_paths = f.read().splitlines()
+        if os.path.isdir(self.data_csv):
+            self.image_paths = os.listdir(self.data_csv)
+        else:
+            with open(self.data_csv, "r") as f:
+                self.image_paths = f.read().splitlines()
         self._length = len(self.image_paths)
         self.labels = {
             "relative_file_path_": [l for l in self.image_paths],
@@ -61,7 +64,7 @@ class SegmentationBase(Dataset):
         if self.size is not None:
             image = self.image_rescaler(image=image)["image"]
         segmentation = Image.open(example["segmentation_path_"])
-        assert segmentation.mode == "L", segmentation.mode
+        # assert segmentation.mode == "L", segmentation.mode
         segmentation = np.array(segmentation).astype(np.uint8)
         if self.shift_segmentation:
             # used to support segmentations containing unlabeled==255 label
@@ -85,7 +88,29 @@ class SegmentationBase(Dataset):
 
 class Examples(SegmentationBase):
     def __init__(self, size=None, random_crop=False, interpolation="bicubic"):
+        super().__init__(data_csv="dataset/flickr/train/imgs",
+                         data_root="dataset/flickr/train/imgs",
+                         segmentation_root="dataset/flickr/train/labels",
+                         n_labels=29,
+                         size=size, random_crop=random_crop, interpolation=interpolation)
+        
+        
+class ValExamples(SegmentationBase):
+    def __init__(self, size=None, random_crop=False, interpolation="bicubic"):
         super().__init__(data_csv="data/sflckr_examples.txt",
                          data_root="data/sflckr_images",
                          segmentation_root="data/sflckr_segmentations",
                          size=size, random_crop=random_crop, interpolation=interpolation)
+
+
+if __name__ == '__main__':
+    img_root = 'dataset/flickr/train/imgs'
+    segment_root = 'dataset/flickr/train/labels'
+    class_num = 29
+    
+    dataset = SegmentationBase(img_root, img_root, segment_root, n_labels=class_num)
+    # img_list = os.listdir(img_root)
+    # with open("dataset/flickr/flickr_data.txt", 'w') as f:
+    #     for line in img_list:
+    #         f.write(line+'\n')
+    #     f.close()
